@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiagKnows - AI Health Assistant</title>
+    <style>
+        /* CSS Variables for consistent theming */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+
+        .card.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+        }
+
+        /* Chatbot */
+        .chat-container {
+            height: 500px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--radius) var(--radius) 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background: var(--light);
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 18px;
+            font-size: 0.95rem;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            border: 1px solid var(--border);
+        }
+
+        .message.user .message-content {
+            background: var(--primary);
+            color: white;
+        }
+
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 1rem;
+        }
+
+        .chat-input button {
+            padding: 0.75rem 1rem;
+            border-radius: 20px;
+        }
+
+        /* Premium Banner */
+        .premium-banner {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--radius);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--danger);
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: var(--success);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            max-width: 500px;
+            margin: 10% auto;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .d-none { display: none; }
+        .d-block { display: block; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DiagKnows</div>
+            <ul class="nav-links">
+                <li><a href="#" onclick="showSection('home')">Home</a></li>
+                <li><a href="#" onclick="showSection('login')">Login</a></li>
+                <li><a href="#" onclick="showSection('signup')">Signup</a></li>
+                <li><a href="#" onclick="showSection('chatbot')">Chatbot</a></li>
+                <li><a href="#" onclick="showSection('premium')">Premium</a></li>
+                <li><a href="#" onclick="showSection('settings')">Settings</a></li>
+                <li><a href="#" onclick="showSection('terms')">Terms</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Premium Trial Banner -->
+    <div class="premium-banner" id="premiumBanner">
+        🎉 Start your 7-day FREE Premium Trial today! Unlock advanced features.
+        <button class="btn" onclick="startPremiumTrial()">Start Trial</button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Home Section -->
+        <div class="card active" id="home">
+            <h1>Welcome to DiagKnows</h1>
+            <p class="mb-3">Your AI-powered health assistant designed to provide personalized health insights and guidance.</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>🤖 AI Chatbot</h3>
+                    <p>Get instant health advice and symptom analysis</p>
+                    <button class="btn" onclick="showSection('chatbot')">Start Chatbot</button>
+                </div>
+                <div class="card">
+                    <h3>📷 Scan Records</h3>
+                    <p>Upload medical documents for AI analysis (Premium)</p>
+                    <button class="btn btn-secondary" onclick="showSection('premium')">Upgrade</button>
+                </div>
+                <div class="card">
+                    <h3>📊 Daily Check-ins</h3>
+                    <p>Track your health and symptoms daily</p>
+                    <button class="btn" onclick="showSection('checkin')">Start Tracking</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Section -->
+        <div class="card" id="login">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" id="loginUsername" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+        </div>
+
+        <!-- Signup Section -->
+        <div class="card" id="signup">
+            <h2>Create Account</h2>
+            <form id="signupForm">
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" class="form-control" id="signupName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="number" class="form-control" id="signupAge" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" class="form-control" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" class="form-control" id="signupLocation" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" class="form-control" id="signupPhone" required>
+                </div>
+                <div class="form-group">
+                    <label>Medical History (Optional)</label>
+                    <textarea class="form-control" id="signupMedical" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Preferred Language</label>
+                    <select class="form-control" id="signupLanguage">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="signupTerms" required>
+                        I agree to the Terms & Conditions
+                    </label>
+                </div>
+                <button type="submit" class="btn">Create Account</button>
+            </form>
+        </div>
+
+        <!-- Chatbot Section -->
+        <div class="card" id="chatbot">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <span>🤖 DiagKnows AI Assistant</span>
+                    <div>
+                        <button class="btn btn-secondary" onclick="toggleVoice()">🎤 Voice</button>
+                        <button class="btn btn-secondary" onclick="translateInput()">🌍 Translate</button>
+                    </div>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot">
+                        <div class="message-content">
+                            Hello! I'm your AI health assistant. What symptoms are you experiencing today?
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Type your symptoms...">
+                    <button class="btn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Premium Section -->
+        <div class="card" id="premium">
+            <h2>Premium Features</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>📷 Medical Image Scanning</h3>
+                    <p>Upload prescriptions and medical reports for AI analysis</p>
+                    <input type="file" id="medicalFile" accept="image/*" style="display: none;">
+                    <button class="btn" onclick="document.getElementById('medicalFile').click()">Upload Image</button>
+                </div>
+                <div class="card">
+                    <h3>🎥 Video Guides</h3>
+                    <p>Access exclusive health and wellness video content</p>
+                    <button class="btn btn-secondary">Watch Videos</button>
+                </div>
+                <div class="card">
+                    <h3>⚡ Faster Analysis</h3>
+                    <p>Priority processing for all AI health assessments</p>
+                    <button class="btn btn-secondary">Learn More</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="card" id="settings">
+            <h2>Settings</h2>
+            <div class="form-group">
+                <label>Language</label>
+                <select class="form-control" id="settingsLanguage">
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="settingsNotifications" checked>
+                    Enable Push Notifications
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="settingsPremium">
+                    Premium Subscription
+                </label>
+            </div>
+            <button class="btn" onclick="saveSettings()">Save Settings</button>
+        </div>
+
+        <!-- Terms Section -->
+        <div class="card" id="terms">
+            <h2>Terms & Conditions</h2>
+            <div style="max-height: 400px; overflow-y: auto;">
+                <h3>Privacy Policy</h3>
+                <p>DiagKnows does not store any personal health data. All information is processed locally and deleted after each session.</p>
+                
+                <h3>Medical Disclaimer</h3>
+                <p>This application is for educational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment.</p>
+                
+                <h3>User Responsibility</h3>
+                <p>Users are responsible for their own health decisions and should consult healthcare providers for serious medical concerns.</p>
+                
+                <h3>Limitation of Liability</h3>
+                <p>DiagKnows and its creators are not liable for any actions taken based on the app's suggestions or recommendations.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Premium Upgrade -->
+    <div class="modal" id="premiumModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Upgrade to Premium</h2>
+            <p>Unlock advanced features including medical image scanning, video guides, and faster AI analysis.</p>
+            <button class="btn" onclick="upgradeToPremium()">Start 7-Day Free Trial</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let isPremium = false;
+        let chatHistory = [];
+        let currentQuestion = 0;
+        let userSymptoms = {};
+
+        // Questions for the chatbot
+        const questions = [
+            "What symptoms are you experiencing?",
+            "How long have you had these symptoms?",
+            "Do you have any known medical conditions?",
+            "Are you currently taking any medication?",
+            "Do you have a fever or pain?"
+        ];
+
+        // Simple AI logic for disease prediction
+        const diseaseLogic = {
+            "fever": ["flu", "cold", "infection"],
+            "cough": ["cold", "flu", "allergies"],
+            "headache": ["migraine", "tension", "dehydration"],
+            "nausea": ["food poisoning", "migraine", "gastroenteritis"],
+            "fatigue": ["flu", "anemia", "stress"]
+        };
+
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            if (sectionId === 'chatbot') {
+                initializeChatbot();
+            }
+        }
+
+        // Form handling
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (username && password) {
+                currentUser = { username, isPremium };
+                showAlert('Login successful!', 'success');
+                showSection('home');
+            } else {
+                showAlert('Please fill in all fields', 'danger');
+            }
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = {
+                name: document.getElementById('signupName').value,
+                age: document.getElementById('signupAge').value,
+                email: document.getElementById('signupEmail').value,
+                location: document.getElementById('signupLocation').value,
+                phone: document.getElementById('signupPhone').value,
+                medical: document.getElementById('signupMedical').value,
+                language: document.getElementById('signupLanguage').value,
+                terms: document.getElementById('signupTerms').checked
+            };
+            
+            if (validateSignup(formData)) {
+                currentUser = { ...formData, isPremium };
+                showAlert('Account created successfully!', 'success');
+                showSection('home');
+            }
+        });
+
+        function validateSignup(data) {
+            if (!data.name || !data.age || !data.email || !data.location || !data.phone) {
+                showAlert('Please fill in all required fields', 'danger');
+                return false;
+            }
+            if (!data.terms) {
+                showAlert('Please accept the Terms & Conditions', 'danger');
+                return false;
+            }
+            return true;
+        }
+
+        // Chatbot functionality
+        function initializeChatbot() {
+            chatHistory = [];
+            currentQuestion = 0;
+            userSymptoms = {};
+            document.getElementById('chatMessages').innerHTML = `
+                <div class="message bot">
+                    <div class="message-content">
+                        Hello! I'm your AI health assistant. What symptoms are you experiencing today?
+                    </div>
+                </div>
+            `;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Process response
+            setTimeout(() => {
+                processChatbotResponse(message);
+            }, 500);
+        }
+
+        function processChatbotResponse(userMessage) {
+            if (currentQuestion < questions.length) {
+                // Store user's answer
+                userSymptoms[`question${currentQuestion}`] = userMessage;
+                currentQuestion++;
+                
+                if (currentQuestion < questions.length) {
+                    // Ask next question
+                    addMessage(questions[currentQuestion], 'bot');
+                } else {
+                    // Analyze symptoms
+                    analyzeSymptoms();
+                }
+            }
+        }
+
+        function analyzeSymptoms() {
+            const symptoms = Object.values(userSymptoms).join(' ').toLowerCase();
+            let possibleConditions = [];
+            
+            // Simple symptom analysis
+            Object.keys(diseaseLogic).forEach(symptom => {
+                if (symptoms.includes(symptom)) {
+                    possibleConditions.push(...diseaseLogic[symptom]);
+                }
+            });
+            
+            // Remove duplicates
+            possibleConditions = [...new Set(possibleConditions)];
+            
+            if (possibleConditions.length === 0) {
+                possibleConditions = ['general health concern'];
+            }
+            
+            const analysis = `
+                Based on your symptoms, you might have: ${possibleConditions.join(', ')}
+                
+                Recommendations:
+                • Rest and stay hydrated
+                • Monitor your symptoms
+                • Consult a healthcare provider if symptoms worsen
+                • Consider over-the-counter medications for relief
+            `;
+            
+            addMessage(analysis, 'bot');
+            
+            // Check for severe symptoms
+            if (symptoms.includes('severe') || symptoms.includes('chest pain') || symptoms.includes('difficulty breathing')) {
+                showSevereSymptomsAlert();
+            }
+        }
+
+        function addMessage(content, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.innerHTML = `<div class="message-content">${content}</div>`;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showSevereSymptomsAlert() {
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger';
+            alert.innerHTML = '⚠️ WARNING: You may need to see a doctor immediately.';
+            document.getElementById('chatMessages').appendChild(alert);
+        }
+
+        // Premium features
+        function startPremiumTrial() {
+            isPremium = true;
+            showAlert('Premium trial started! Enjoy 7 days of advanced features.', 'success');
+            document.getElementById('premiumBanner').style.display = 'none';
+        }
+
+        function upgradeToPremium() {
+            isPremium = true;
+            closeModal();
+            showAlert('Welcome to Premium!', 'success');
+        }
+
+        function closeModal() {
+            document.getElementById('premiumModal').style.display = 'none';
+        }
+
+        // Utility functions
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            document.querySelector('.container').insertBefore(alert, document.querySelector('.container').firstChild);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function toggleVoice() {
+            showAlert('Voice feature coming soon!', 'warning');
+        }
+
+        function translateInput() {
+            showAlert('Translation feature coming soon!', 'warning');
+        }
+
+        function saveSettings() {
+            showAlert('Settings saved!', 'success');
+        }
+
+        // File upload handling
+        document.getElementById('medicalFile').addEventListener('change', function(e) {
+            if (!isPremium) {
+                document.getElementById('premiumModal').style.display = 'block';
+                return;
+            }
+            
+            const file = e.target.files[0];
+            if (file) {
+                showAlert('Medical image uploaded! AI analysis in progress...', 'success');
+                setTimeout(() => {
+                    showAlert('Analysis complete: Document appears to be a prescription for common medication.', 'success');
+                }, 2000);
+            }
+        });
+
+        // Enter key for chat
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('home');
+        });
+    </script>
+</body>
+</html> 

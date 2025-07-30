@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DiagKnows - AI Health Assistant</title>
+  <style>
+    :root {
+      --primary: #2a6ebb;
+      --primary-dark: #1d4e8a;
+      --bg: #f7f9fa;
+      --card-bg: #fff;
+      --border: #d1dbe3;
+      --input-bg: #f1f5f9;
+      --error: #d9534f;
+      --success: #28a745;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: #222;
+    }
+    nav {
+      background: var(--primary);
+      color: #fff;
+      padding: 0 0 0 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .nav-container {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      height: 56px;
+    }
+    .logo {
+      font-size: 1.4em;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 24px;
+    }
+    .nav-links a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1em;
+      padding: 8px 0;
+      border-bottom: 2px solid transparent;
+      transition: border 0.2s;
+    }
+    .nav-links a.active, .nav-links a:hover {
+      border-bottom: 2px solid #fff;
+    }
+    main {
+      max-width: 900px;
+      margin: 32px auto 0 auto;
+      padding: 0 16px 32px 16px;
+    }
+    section {
+      display: none;
+      background: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 32px 24px 24px 24px;
+      margin-bottom: 32px;
+      animation: fadeIn 0.4s;
+    }
+    section.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1, h2 {
+      color: var(--primary);
+      margin-top: 0;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1em;
+    }
+    input[type="text"], input[type="password"], input[type="email"], input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--input-bg);
+      font-size: 1em;
+      margin-bottom: 2px;
+      box-sizing: border-box;
+    }
+    button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 9px 22px;
+      border-radius: 4px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: var(--primary-dark);
+    }
+    .message {
+      margin-top: 8px;
+      font-size: 1em;
+      padding: 8px 12px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .error {
+      background: #fbeaea;
+      color: var(--error);
+      border: 1px solid #f5c6cb;
+    }
+    .success {
+      background: #eafaf1;
+      color: var(--success);
+      border: 1px solid #b7e4c7;
+    }
+    .chatbot-container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e3e8ee;
+      padding: 18px 16px 12px 16px;
+      min-height: 320px;
+      box-sizing: border-box;
+    }
+    .chat {
+      max-height: 260px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+      padding-right: 4px;
+    }
+    .chat-message {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+    }
+    .chatbot {
+      background: var(--primary);
+      color: #fff;
+      border-radius: 12px 12px 12px 2px;
+      padding: 8px 14px;
+      margin-right: 8px;
+      max-width: 75%;
+      font-size: 1em;
+    }
+    .user {
+      background: #e9ecef;
+      color: #222;
+      border-radius: 12px 12px 2px 12px;
+      padding: 8px 14px;
+      margin-left: auto;
+      max-width: 75%;
+      font-size: 1em;
+    }
+    .chatbot-input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .chatbot-input-row input {
+      flex: 1;
+      font-size: 1em;
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+    }
+    .chatbot-input-row button {
+      padding: 8px 18px;
+      font-size: 1em;
+    }
+    footer {
+      background: #e9ecef;
+      color: #555;
+      text-align: center;
+      padding: 18px 10px 12px 10px;
+      font-size: 0.97em;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+    @media (max-width: 700px) {
+      .nav-container, main {
+        padding: 0 4vw;
+      }
+      .chatbot-container {
+        padding: 10px 4vw 8px 4vw;
+      }
+      section {
+        padding: 18px 4vw 16px 4vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-container">
+      <span class="logo">DiagKnows</span>
+      <div class="nav-links">
+        <a href="#" data-section="home" class="active">Home</a>
+        <a href="#" data-section="login">Login</a>
+        <a href="#" data-section="signup">Signup</a>
+        <a href="#" data-section="chatbot">Chatbot</a>
+        <a href="#" data-section="terms">Terms & Conditions</a>
+      </div>
+    </div>
+  </nav>
+  <main>
+    <section id="home" class="active">
+      <h1>Welcome to DiagKnows</h1>
+      <p style="font-size:1.15em;">
+        We’re building <strong>DiagKnows</strong>, an AI-powered health assistant designed to save people time and money by helping them understand symptoms and get accurate treatment suggestions.
+      </p>
+    </section>
+    <section id="login">
+      <h2>Login</h2>
+      <form id="loginForm" autocomplete="off">
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <input type="text" id="login-username" name="login-username" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" name="login-password" required>
+        </div>
+        <button type="submit">Login</button>
+        <div id="login-message" class="message" style="display:none;"></div>
+      </form>
+    </section>
+    <section id="signup">
+      <h2>Sign Up</h2>
+      <form id="signupForm" autocomplete="off">
+        <div class="form-group">
+          <label for="signup-name">Name</label>
+          <input type="text" id="signup-name" name="signup-name" required>
+        </div>
+        <div class="form-group">
+          <label for="signup-age">Age</label>
+          <input type="number" id="signup-age" name="signup-age" min="0" required>
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" name="signup-email" required>
+        </div>
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" name="signup-password" required>
+        </div>
+        <div class="form-group">
+          <label for="signup-confirm">Confirm Password</label>
+          <input type="password" id="signup-confirm" name="signup-confirm" required>
+        </div>
+        <button type="submit">Sign Up</button>
+        <div id="signup-message" class="message" style="display:none;"></div>
+      </form>
+    </section>
+    <section id="chatbot">
+      <h2>DiagKnows Chatbot</h2>
+      <div class="chatbot-container">
+        <div class="chat" id="chat-window"></div>
+        <form id="chatbot-form" class="chatbot-input-row" autocomplete="off" style="display:none;">
+          <input type="text" id="chatbot-input" placeholder="Type your answer..." autocomplete="off" required>
+          <button type="submit">Send</button>
+        </form>
+        <div id="chatbot-end-message" style="display:none; margin-top:12px; color:var(--primary); font-weight:bold;">Thank you. Your information will be analyzed.</div>
+      </div>
+    </section>
+    <section id="terms">
+      <h2>Terms & Conditions</h2>
+      <ul>
+        <li><strong>No Medical Advice:</strong> DiagKnows provides information for guidance only and does not replace professional medical advice, diagnosis, or treatment.</li>
+        <li><strong>Data Privacy:</strong> Your information is handled with care and not shared with third parties. No personal health data is stored on this demo app.</li>
+        <li><strong>User Responsibility:</strong> Users are responsible for their own health decisions and should consult a healthcare provider for urgent or serious concerns.</li>
+        <li><strong>Limitation of Liability:</strong> DiagKnows and its creators are not liable for any actions taken based on the app’s suggestions.</li>
+      </ul>
+    </section>
+  </main>
+  <footer>
+    &copy; 2024 DiagKnows. All rights reserved.
+  </footer>
+  <script>
+    // Navigation
+    const navLinks = document.querySelectorAll('.nav-links a');
+    const sections = document.querySelectorAll('main > section');
+    navLinks.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        navLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        const sectionId = link.getAttribute('data-section');
+        sections.forEach(sec => {
+          if (sec.id === sectionId) sec.classList.add('active');
+          else sec.classList.remove('active');
+        });
+        // Reset chatbot if navigating to chatbot
+        if (sectionId === 'chatbot') startChatbot();
+      });
+    });
+
+    // Login Form
+    const loginForm = document.getElementById('loginForm');
+    const loginMsg = document.getElementById('login-message');
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = loginForm['login-username'].value.trim();
+      const password = loginForm['login-password'].value.trim();
+      if (!username || !password) {
+        showMessage(loginMsg, 'Please enter both username and password.', 'error');
+      } else {
+        showMessage(loginMsg, 'Login successful! (Demo only)', 'success');
+        loginForm.reset();
+      }
+    });
+
+    // Signup Form
+    const signupForm = document.getElementById('signupForm');
+    const signupMsg = document.getElementById('signup-message');
+    signupForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = signupForm['signup-name'].value.trim();
+      const age = signupForm['signup-age'].value.trim();
+      const email = signupForm['signup-email'].value.trim();
+      const password = signupForm['signup-password'].value;
+      const confirm = signupForm['signup-confirm'].value;
+      if (!name || !age || !email || !password || !confirm) {
+        showMessage(signupMsg, 'Please fill in all fields.', 'error');
+      } else if (password !== confirm) {
+        showMessage(signupMsg, 'Passwords do not match.', 'error');
+      } else {
+        showMessage(signupMsg, 'Signup successful! (Demo only)', 'success');
+        signupForm.reset();
+      }
+    });
+
+    function showMessage(el, msg, type) {
+      el.textContent = msg;
+      el.className = 'message ' + type;
+      el.style.display = 'inline-block';
+      setTimeout(() => { el.style.display = 'none'; }, 3500);
+    }
+
+    // Chatbot
+    const chatbotQuestions = [
+      'What symptoms are you experiencing?',
+      'How long have you had these symptoms?',
+      'Do you have any known medical conditions?',
+      'Are you currently taking any medication?',
+      'Do you have a fever or any pain?'
+    ];
+    let chatbotStep = 0;
+    let chatbotAnswers = [];
+    const chatWindow = document.getElementById('chat-window');
+    const chatbotForm = document.getElementById('chatbot-form');
+    const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotEndMsg = document.getElementById('chatbot-end-message');
+
+    function startChatbot() {
+      chatWindow.innerHTML = '';
+      chatbotStep = 0;
+      chatbotAnswers = [];
+      chatbotForm.style.display = 'flex';
+      chatbotInput.value = '';
+      chatbotInput.disabled = false;
+      chatbotEndMsg.style.display = 'none';
+      addChatbotMessage(chatbotQuestions[0]);
+      chatbotInput.focus();
+    }
+
+    function addChatbotMessage(msg) {
+      const div = document.createElement('div');
+      div.className = 'chat-message';
+      div.innerHTML = `<div class="chatbot">${msg}</div>`;
+      chatWindow.appendChild(div);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+    function addUserMessage(msg) {
+      const div = document.createElement('div');
+      div.className = 'chat-message';
+      div.innerHTML = `<div class="user">${msg}</div>`;
+      chatWindow.appendChild(div);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    chatbotForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const answer = chatbotInput.value.trim();
+      if (!answer) return;
+      addUserMessage(answer);
+      chatbotAnswers.push(answer);
+      chatbotInput.value = '';
+      chatbotStep++;
+      if (chatbotStep < chatbotQuestions.length) {
+        setTimeout(() => addChatbotMessage(chatbotQuestions[chatbotStep]), 600);
+      } else {
+        chatbotForm.style.display = 'none';
+        setTimeout(() => {
+          chatbotEndMsg.style.display = 'block';
+        }, 700);
+      }
+    });
+
+    // Start chatbot if user lands on chatbot section
+    if (document.getElementById('chatbot').classList.contains('active')) {
+      startChatbot();
+    }
+  </script>
+</body>
+</html> 

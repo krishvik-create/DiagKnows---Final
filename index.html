@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiagKnows - Healthcare AI Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f9fa;
+            margin: 0;
+            padding: 0;
+            color: #222;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 32px 24px 24px 24px;
+        }
+        h1, h2 {
+            color: #2a6ebb;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        .questions {
+            margin: 24px 0;
+        }
+        .forms {
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+            margin: 32px 0 16px 0;
+        }
+        .form-box {
+            background: #f1f5f9;
+            border-radius: 6px;
+            padding: 20px;
+            flex: 1 1 260px;
+            min-width: 260px;
+        }
+        .form-box h3 {
+            margin-top: 0;
+        }
+        label {
+            display: block;
+            margin: 10px 0 4px 0;
+            font-size: 0.97em;
+        }
+        input[type="text"], input[type="password"], input[type="email"], input[type="number"] {
+            width: 100%;
+            padding: 7px 8px;
+            border: 1px solid #bfc9d1;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+        button {
+            background: #2a6ebb;
+            color: #fff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+        button:hover {
+            background: #1d4e8a;
+        }
+        footer {
+            background: #e9ecef;
+            color: #555;
+            text-align: center;
+            padding: 18px 10px 12px 10px;
+            font-size: 0.97em;
+            border-top: 1px solid #d1dbe3;
+            margin-top: 40px;
+        }
+        @media (max-width: 700px) {
+            .container {
+                padding: 16px 4vw;
+            }
+            .forms {
+                flex-direction: column;
+                gap: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DiagKnows: Your Healthcare AI Assistant</h1>
+        <p>
+            DiagKnows is an innovative AI-powered assistant designed to simplify healthcare for everyone. Our mission is to help users navigate healthcare challenges, from scheduling appointments to understanding costs, by providing smart, accessible, and personalized support.
+        </p>
+
+        <div class="questions">
+            <h2>We'd love your input!</h2>
+            <form>
+                <label for="q1">1. Which problem is the most significant in healthcare?</label>
+                <input type="text" id="q1" name="q1" placeholder="Your answer...">
+
+                <label for="q2">2. Have you ever had problems with scheduling for a doctor?</label>
+                <input type="text" id="q2" name="q2" placeholder="Yes/No or details...">
+
+                <label for="q3">3. Does healthcare cost a lot of money for you?</label>
+                <input type="text" id="q3" name="q3" placeholder="Your answer...">
+
+                <button type="submit">Submit Answers</button>
+            </form>
+        </div>
+
+        <h2>Common Healthcare Problems</h2>
+        <ul>
+            <li>Long wait times for appointments</li>
+            <li>Difficulty finding the right specialist</li>
+            <li>High and unpredictable costs</li>
+            <li>Complex insurance processes</li>
+            <li>Lack of personalized care</li>
+            <li>Poor communication between providers</li>
+        </ul>
+
+        <h2>The DiagKnows Solution</h2>
+        <p>
+            DiagKnows leverages advanced AI to:
+        </p>
+        <ul>
+            <li>Streamline appointment scheduling and reminders</li>
+            <li>Provide cost estimates and insurance guidance</li>
+            <li>Connect you with the right healthcare professionals</li>
+            <li>Offer personalized health insights and support</li>
+            <li>Improve communication and follow-up care</li>
+        </ul>
+
+        <div class="forms">
+            <div class="form-box">
+                <h3>Login</h3>
+                <form>
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" name="login-username" required>
+
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="login-password" required>
+
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+            <div class="form-box">
+                <h3>Sign Up</h3>
+                <form>
+                    <label for="signup-name">Name</label>
+                    <input type="text" id="signup-name" name="signup-name" required>
+
+                    <label for="signup-age">Age</label>
+                    <input type="number" id="signup-age" name="signup-age" min="0" required>
+
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" name="signup-email" required>
+
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" name="signup-password" required>
+
+                    <label for="signup-confirm">Confirm Password</label>
+                    <input type="password" id="signup-confirm" name="signup-confirm" required>
+
+                    <button type="submit">Sign Up</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <strong>Terms & Conditions:</strong> By using DiagKnows, you agree to use the app responsibly, respect privacy, and understand that information provided is for guidance only and not a substitute for professional medical advice.
+    </footer>
+</body>
+</html> 
